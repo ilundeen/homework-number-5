@@ -1,10 +1,10 @@
 ---
 title: "homework-number-5"
-author: "Ingrid Lundeen"
+author: "Ingrid Lundeen and Rachel Voyt"
 date: "November 16, 2016"
 output: html_document
 ---
-#Ingrid and Rachel
+#Ingrid L and Rachel V
 ```{r}
 library(curl) #attach the appropriate package
 f <- curl("https://raw.githubusercontent.com/difiore/ADA2016/master/KamilarAndCooperData.csv") #use curl function to pull in the link for the data
@@ -34,8 +34,11 @@ for(i in 1:1000) {
       log(d$HomeRange_km2)[this.ind]~log(d$Body_mass_female_mean)[this.ind]))[2]
 }
 
-
-
+bootsee<-bootCase(a, f.=coef, B=1000)
+bootsee
+mean(bootsee[,1])
+se(bootsee[,1])
+quantile(bootsee [,1], c(0.025, 0.975))
 ```
 ##Estimate the standard error for each of your β coefficients as the standard deviation of the sampling distribution from your bootstrap and determine the 95% CI for each of your β coefficients based on the appropriate quantiles from your sampling distribution
 ```{r}
@@ -60,6 +63,7 @@ bootci
 
 ##Extra Credit +2
 ```{r}
+#THIS ONE DOESN'T WORK YET
 bootsy<-function(d, m, conf.level=0.95, n=1000){
   model<-lm(m, data=d)
   intercept<-coefficients(model)[1]
@@ -87,4 +91,28 @@ bootsy<-function(d, m, conf.level=0.95, n=1000){
   return(c(intercept,slope, intercept_standard_error, slope_standard_error, confidence_interval, bootstrap_interval_mean, bootstrap_interval_standardError, bootstrap_interval_conf.int, bootstrap_slope_mean, bootstrap_slope_standardError, bootstrap_slope_conf.int))
 }
 
+```
+
+
+```{r}
+#THIS ONE DOESNT REALLY WORK
+bootsy<-function(d, m, conf.level=0.95, n=1000){
+  model<-lm(m, data=d)
+  intercept<-coefficients(model)[1]
+  slope<-coefficients(model)[2]
+  intercept_standard_error<-summary(model)$coefficients[1,2]
+  slope_standard_error<-summary(model)$coefficients[2,2]
+  confidence_interval<-confint(model, level=conf.level)
+  bootsie<-bootCase(model, f.=coef, B=1000)
+  bootstrap_interval_mean<-mean(bootsie[,1])
+  bootstrap_interval_standardError<-se(bootsie[,1])
+  bootstrap_interval_conf.int<- quantile(bootsie [,1], c(0.025, 0.975))
+  bootstrap_slope_mean<-mean(bootsie[,2])
+  bootstrap_slope_standardError<-se(bootsie[,2])
+  bootstrap_slope_conf.int<- quantile(boot_int[,2], c(0.025, 0.975))
+  return(c(intercept,slope, intercept_standard_error, slope_standard_error, confidence_interval, bootstrap_interval_mean, bootstrap_interval_standardError, bootstrap_interval_conf.int, bootstrap_slope_mean, bootstrap_slope_standardError, bootstrap_slope_conf.int))
+}
+
+p<-bootsy(d, a, conf.level=0.95, n=1000)
+p
 ```
